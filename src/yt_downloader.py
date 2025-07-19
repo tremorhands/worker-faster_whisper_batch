@@ -1,4 +1,5 @@
 import yt_dlp
+import time
 
 def audio_from_url(url: str, path_to_save: str, is_playlist: bool = False) -> dict:
     """Download audio and return video info"""
