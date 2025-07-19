@@ -3,13 +3,14 @@
     {
       "name": "basic_test",
       "input": {
-        "audio": "https://github.com/runpod-workers/sample-inputs/raw/main/audio/gettysburg.wav",
+        "audio": "https://www.youtube.com/watch?v=XFrn7oA4jgk", 
         "model": "turbo",
         "transcription": "plain text",
         "translate": false,
         "temperature": 0,
         "best_of": 5,
         "beam_size": 5,
+        "batch": 64,
         "suppress_tokens": "-1",
         "condition_on_previous_text": false,
         "temperature_increment_on_fallback": 0.2,
@@ -17,7 +18,7 @@
         "logprob_threshold": -1,
         "no_speech_threshold": 0.6
       },
-      "timeout": 10000
+      "timeout": 20000
     }
   ],
   "config": {

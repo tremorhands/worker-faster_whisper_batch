@@ -96,7 +96,8 @@ def run_whisper_job(job):
                 logprob_threshold=job_input["logprob_threshold"],
                 no_speech_threshold=job_input["no_speech_threshold"],
                 enable_vad=job_input["enable_vad"],
-                word_timestamps=job_input["word_timestamps"]
+                word_timestamps=job_input["word_timestamps"],
+                batch_size=job_input.get["batch_size", 0]
             )
 
         whisper_results.update(video_info)
