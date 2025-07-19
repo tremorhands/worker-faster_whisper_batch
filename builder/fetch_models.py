@@ -1,8 +1,8 @@
 from faster_whisper.utils import download_model
 
 model_names = [
-    "distil-large-v3",
-    "turbo",
+    "deepdml/faster-whisper-large-v3-turbo-ct2",
+    # "turbo",
 ]
 
 

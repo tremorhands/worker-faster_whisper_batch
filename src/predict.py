@@ -18,8 +18,9 @@ from faster_whisper.utils import format_timestamp
 
 # Define available models (for validation)
 AVAILABLE_MODELS = {
-    "distil-large-v3",
-    "turbo",
+    "deepdml/faster-whisper-large-v3-turbo-ct2",
+    # "distil-large-v3",
+    # "turbo",
 }
 
 

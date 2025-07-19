@@ -78,7 +78,7 @@ def run_whisper_job(job):
         with rp_debugger.LineTimer('prediction_step'):
             whisper_results = MODEL.predict(
                 audio=audio_input,
-                model_name=job_input["model"],
+                model_name=job_input.get("model", "deepdml/faster-whisper-large-v3-turbo-ct2"),
                 transcription=job_input["transcription"],
                 translation=job_input["translation"],
                 translate=job_input["translate"],
@@ -97,7 +97,7 @@ def run_whisper_job(job):
                 no_speech_threshold=job_input["no_speech_threshold"],
                 enable_vad=job_input["enable_vad"],
                 word_timestamps=job_input["word_timestamps"],
-                batch_size=job_input.get["batch_size", 0]
+                batch_size=job_input.get("batch_size", 0)
             )
 
         whisper_results.update(video_info)

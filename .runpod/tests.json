@@ -4,7 +4,7 @@
       "name": "basic_test",
       "input": {
         "audio": "https://www.youtube.com/watch?v=XFrn7oA4jgk", 
-        "model": "turbo",
+        "model": "deepdml/faster-whisper-large-v3-turbo-ct2",
         "transcription": "plain text",
         "translate": false,
         "temperature": 0,
