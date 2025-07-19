@@ -7,10 +7,12 @@ The handler must be called with --rp_debugger flag to enable it.
 """
 import base64
 import tempfile
+import os
 
 from rp_schema import INPUT_VALIDATIONS
 from runpod.serverless.utils import download_files_from_urls, rp_cleanup, rp_debugger
 from runpod.serverless.utils.rp_validator import validate
+from yt_downloader import audio_from_url
 import runpod
 import predict
 
@@ -61,39 +63,46 @@ def run_whisper_job(job):
     if job_input.get('audio', False) and job_input.get('audio_base64', False):
         return {'error': 'Must provide either audio or audio_base64, not both'}
 
-    if job_input.get('audio', False):
-        with rp_debugger.LineTimer('download_step'):
-            audio_input = download_files_from_urls(job['id'], [job_input['audio']])[0]
+    with tempfile.TemporaryDirectory() as tmpdir: 
+        if job_input.get('audio', False):
+            with rp_debugger.LineTimer('download_step'):
+                # audio_input = download_files_from_urls(job['id'], [job_input['audio']])[0]
+                tmp_audio = os.path.join(tmpdir, "audio")
+                video_info = audio_from_url(job_input['audio'], tmp_audio)
+                tmp_audio += '.wav' 
+                audio_input = tmp_audio
 
-    if job_input.get('audio_base64', False):
-        audio_input = base64_to_tempfile(job_input['audio_base64'])
+        if job_input.get('audio_base64', False):
+            audio_input = base64_to_tempfile(job_input['audio_base64'])
 
-    with rp_debugger.LineTimer('prediction_step'):
-        whisper_results = MODEL.predict(
-            audio=audio_input,
-            model_name=job_input["model"],
-            transcription=job_input["transcription"],
-            translation=job_input["translation"],
-            translate=job_input["translate"],
-            language=job_input["language"],
-            temperature=job_input["temperature"],
-            best_of=job_input["best_of"],
-            beam_size=job_input["beam_size"],
-            patience=job_input["patience"],
-            length_penalty=job_input["length_penalty"],
-            suppress_tokens=job_input.get("suppress_tokens", "-1"),
-            initial_prompt=job_input["initial_prompt"],
-            condition_on_previous_text=job_input["condition_on_previous_text"],
-            temperature_increment_on_fallback=job_input["temperature_increment_on_fallback"],
-            compression_ratio_threshold=job_input["compression_ratio_threshold"],
-            logprob_threshold=job_input["logprob_threshold"],
-            no_speech_threshold=job_input["no_speech_threshold"],
-            enable_vad=job_input["enable_vad"],
-            word_timestamps=job_input["word_timestamps"]
-        )
+        with rp_debugger.LineTimer('prediction_step'):
+            whisper_results = MODEL.predict(
+                audio=audio_input,
+                model_name=job_input["model"],
+                transcription=job_input["transcription"],
+                translation=job_input["translation"],
+                translate=job_input["translate"],
+                language=job_input["language"],
+                temperature=job_input["temperature"],
+                best_of=job_input["best_of"],
+                beam_size=job_input["beam_size"],
+                patience=job_input["patience"],
+                length_penalty=job_input["length_penalty"],
+                suppress_tokens=job_input.get("suppress_tokens", "-1"),
+                initial_prompt=job_input["initial_prompt"],
+                condition_on_previous_text=job_input["condition_on_previous_text"],
+                temperature_increment_on_fallback=job_input["temperature_increment_on_fallback"],
+                compression_ratio_threshold=job_input["compression_ratio_threshold"],
+                logprob_threshold=job_input["logprob_threshold"],
+                no_speech_threshold=job_input["no_speech_threshold"],
+                enable_vad=job_input["enable_vad"],
+                word_timestamps=job_input["word_timestamps"]
+            )
 
-    with rp_debugger.LineTimer('cleanup_step'):
-        rp_cleanup.clean(['input_objects'])
+        whisper_results.update(video_info)
+
+        with rp_debugger.LineTimer('cleanup_step'):
+            rp_cleanup.clean(['input_objects'])
 
     return whisper_results
 

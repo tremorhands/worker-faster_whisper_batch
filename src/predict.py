@@ -13,7 +13,7 @@ import numpy as np
 
 from runpod.serverless.utils import rp_cuda
 
-from faster_whisper import WhisperModel
+from faster_whisper import WhisperModel, BatchedInferencePipeline
 from faster_whisper.utils import format_timestamp
 
 # Define available models (for validation)
@@ -29,6 +29,7 @@ class Predictor:
     def __init__(self):
         """Initializes the predictor with no models loaded."""
         self.models = {}
+        self.batched_model = None
         self.model_lock = (
             threading.Lock()
         )  # Lock for thread-safe model loading/unloading
@@ -48,6 +49,7 @@ class Predictor:
         temperature=0,
         best_of=5,
         beam_size=5,
+        batch_size=0,
         patience=1,
         length_penalty=None,
         suppress_tokens="-1",
@@ -97,6 +99,7 @@ class Predictor:
                     )
                     self.models[model_name] = loaded_model
                     model = loaded_model
+                    self.batched_model = BatchedInferencePipeline(model)
                     print(f"Model {model_name} loaded successfully.")
                 except Exception as e:
                     print(f"Error loading model {model_name}: {e}")
@@ -126,30 +129,58 @@ class Predictor:
         # Note: FasterWhisper's transcribe might release the GIL, potentially allowing
         # other threads to acquire the model_lock if transcribe is lengthy.
         # If issues arise, the lock might need to encompass the transcribe call too.
-        segments, info = list(
-            model.transcribe(
-                str(audio),
-                language=language,
-                task="transcribe",
-                beam_size=beam_size,
-                best_of=best_of,
-                patience=patience,
-                length_penalty=length_penalty,
-                temperature=temperature,
-                compression_ratio_threshold=compression_ratio_threshold,
-                log_prob_threshold=logprob_threshold,
-                no_speech_threshold=no_speech_threshold,
-                condition_on_previous_text=condition_on_previous_text,
-                initial_prompt=initial_prompt,
-                prefix=None,
-                suppress_blank=True,
-                suppress_tokens=[-1],  # Might need conversion from string
-                without_timestamps=False,
-                max_initial_timestamp=1.0,
-                word_timestamps=word_timestamps,
-                vad_filter=enable_vad,
+        if batch_size > 0:
+            segments, info = list(
+                self.batched_model.transcribe(
+                    str(audio),
+                    language=language,
+                    task="transcribe",
+                    beam_size=beam_size,
+                    best_of=best_of,
+                    patience=patience,
+                    length_penalty=length_penalty,
+                    temperature=temperature,
+                    compression_ratio_threshold=compression_ratio_threshold,
+                    log_prob_threshold=logprob_threshold,
+                    no_speech_threshold=no_speech_threshold,
+                    condition_on_previous_text=condition_on_previous_text,
+                    initial_prompt=initial_prompt,
+                    prefix=None,
+                    suppress_blank=True,
+                    suppress_tokens=[-1],  # Might need conversion from string
+                    without_timestamps=False,
+                    max_initial_timestamp=1.0,
+                    word_timestamps=word_timestamps,
+                    vad_filter=enable_vad,
+                    batch_size=batch_size,
+                )
             )
-        )
+
+        else:
+            segments, info = list(
+                model.transcribe(
+                    str(audio),
+                    language=language,
+                    task="transcribe",
+                    beam_size=beam_size,
+                    best_of=best_of,
+                    patience=patience,
+                    length_penalty=length_penalty,
+                    temperature=temperature,
+                    compression_ratio_threshold=compression_ratio_threshold,
+                    log_prob_threshold=logprob_threshold,
+                    no_speech_threshold=no_speech_threshold,
+                    condition_on_previous_text=condition_on_previous_text,
+                    initial_prompt=initial_prompt,
+                    prefix=None,
+                    suppress_blank=True,
+                    suppress_tokens=[-1],  # Might need conversion from string
+                    without_timestamps=False,
+                    max_initial_timestamp=1.0,
+                    word_timestamps=word_timestamps,
+                    vad_filter=enable_vad,
+                )
+            )
 
         segments = list(segments)
 
@@ -169,9 +200,9 @@ class Predictor:
             )
 
         results = {
-            "segments": serialize_segments(segments),
-            "detected_language": info.language,
+            # "segments": serialize_segments(segments),
             "transcription": transcription_output,
+            "detected_language": info.language,
             "translation": translation_output,
             "device": "cuda" if rp_cuda.is_available() else "cpu",
             "model": model_name,
