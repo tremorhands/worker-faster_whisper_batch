@@ -29,7 +29,7 @@ def audio_from_url(url: str, path_to_save: str, is_playlist: bool = False) -> di
         # downloaded_file = ydl.prepare_filename(info)
         download_time = round(time.time() - start,1)
         # logging.info(f"Downloaded file: {downloaded_file} за {round(time.time() - start,1)}. Кодек: {info.get("acodec")}, Битрейт: {info.get("abr")}, Размер {round(info.get("filesize", 0) / 1024 / 1024, 2), "МБ"}")
-
+    print(f'__________________ download for {download_time} __________________')
     result = {
         'duration': info.get("duration", "Unknown Duration"),
         'title': info.get("title", "Unknown Title"),

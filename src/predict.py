@@ -10,6 +10,9 @@ from concurrent.futures import (
     ThreadPoolExecutor,
 )  # Still needed for transcribe potentially?
 import numpy as np
+import torch
+
+
 
 from runpod.serverless.utils import rp_cuda
 
@@ -88,27 +91,34 @@ class Predictor:
                         # FasterWhisper uses CTranslate2; explicit cache clearing might not be needed
                         # but gc.collect() is generally helpful.
                         pass
-                    print(f"Model {existing_model_name} unloaded.")
+                    print(f"Model {existing_model_name} unloaded. ")
 
                 # Load the requested model
                 print(f"Loading model: {model_name}...")
                 try:
+                    if rp_cuda.is_available() and torch.cuda.is_available():
+                        self.device = "cuda"
+                        self.compute_type = "float16"
+                    else:
+                        self.device = "cpu"
+                        self.compute_type = "int8"
+                    print(f'Device set to {self.device}')       
                     loaded_model = WhisperModel(
                         model_name,
-                        device="cuda" if rp_cuda.is_available() else "cpu",
-                        compute_type="float16" if rp_cuda.is_available() else "int8",
+                        device=self.device,
+                        compute_type=self.compute_type,
                     )
                     self.models[model_name] = loaded_model
                     model = loaded_model
                     self.batched_model = BatchedInferencePipeline(model)
-                    print(f"Model {model_name} loaded successfully.")
+                    print(f"Model {model_name} loaded successfully. On {self.device}")
                 except Exception as e:
                     print(f"Error loading model {model_name}: {e}")
                     raise ValueError(f"Failed to load model {model_name}: {e}") from e
             else:
                 # Model already loaded
                 model = self.models[model_name]
-                print(f"Using already loaded model: {model_name}")
+                print(f"Using already loaded model: {model_name} on {self.device}")
 
             # Ensure model is loaded before proceeding
             if model is None:
@@ -205,7 +215,7 @@ class Predictor:
             "transcription": transcription_output,
             "detected_language": info.language,
             "translation": translation_output,
-            "device": "cuda" if rp_cuda.is_available() else "cpu",
+            "device": self.device,
             "model": model_name,
         }
 
