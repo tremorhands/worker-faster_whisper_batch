@@ -49,6 +49,11 @@ INPUT_VALIDATIONS = {
         'required': False,
         'default': 5
     },
+    'batch_size': {
+        'type': int,
+        'required': False,
+        'default': 64
+    },
     'patience': {
         'type': float,
         'required': False,
