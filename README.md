@@ -10,16 +10,7 @@
 
 ## Models
 
-- tiny
-- base
-- small
-- medium
-- large-v1
-- large-v2
-- large-v3
-- distil-large-v2
-- distil-large-v3
-- turbo
+- deepdml/faster-whisper-large-v3-turbo-ct2
 
 ## Input
 

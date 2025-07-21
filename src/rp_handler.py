@@ -16,6 +16,10 @@ from yt_downloader import audio_from_url
 import runpod
 import predict
 
+import torch, ctranslate2
+print("torch.cuda:", torch.cuda.is_available(), torch.version.cuda)
+print("ctranslate2 CUDA:", ctranslate2.has_cuda())
+
 
 MODEL = predict.Predictor()
 MODEL.setup()
@@ -64,16 +68,16 @@ def run_whisper_job(job):
         return {'error': 'Must provide either audio or audio_base64, not both'}
 
     with tempfile.TemporaryDirectory() as tmpdir: 
-        if job_input.get('audio', False):
-            with rp_debugger.LineTimer('download_step'):
-                # audio_input = download_files_from_urls(job['id'], [job_input['audio']])[0]
-                tmp_audio = os.path.join(tmpdir, "audio")
-                video_info = audio_from_url(job_input['audio'], tmp_audio)
-                tmp_audio += '.wav' 
-                audio_input = tmp_audio
-
-        if job_input.get('audio_base64', False):
-            audio_input = base64_to_tempfile(job_input['audio_base64'])
+        
+        with rp_debugger.LineTimer('download_step'):
+            if job_input.get('audio', False):
+                audio_input = os.path.join(tmpdir, "audio")
+                video_info = audio_from_url(job_input['audio'], audio_input)
+                audio_input += '.wav'
+            elif job_input.get('audio_download_link', False):
+                audio_input = download_files_from_urls(job['id'], [job_input['audio']])[0]
+            elif job_input.get('audio_base64', False):
+                audio_input = base64_to_tempfile(job_input['audio_base64'])
 
         with rp_debugger.LineTimer('prediction_step'):
             whisper_results = MODEL.predict(
