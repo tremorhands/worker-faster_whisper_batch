@@ -1,8 +1,10 @@
 --extra-index-url https://download.pytorch.org/whl/cu121
 torch==2.1.2+cu121
-torchaudio==2.1.2+cu121      # если используете
-
+torchaudio==2.1.2+cu121 
+numpy<2
 runpod~=1.7.9
 yt_dlp
 faster-whisper==1.1.0
-ctranslate2==4.4.0           # фиксируем, чтоб pip не поднял 4.5+
+ctranslate2==4.4.0
+
+# Torch + CT2 version: https://github.com/SYSTRAN/faster-whisper/issues/1086

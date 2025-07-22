@@ -16,9 +16,8 @@ from yt_downloader import audio_from_url
 import runpod
 import predict
 
-import torch, ctranslate2
+import torch
 print("torch.cuda:", torch.cuda.is_available(), torch.version.cuda)
-print("ctranslate2 CUDA:", ctranslate2.has_cuda())
 
 
 MODEL = predict.Predictor()
