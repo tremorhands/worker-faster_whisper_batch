@@ -1,10 +1,11 @@
---extra-index-url https://download.pytorch.org/whl/cu121
-torch==2.1.2+cu121
-torchaudio==2.1.2+cu121 
+--extra-index-url https://download.pytorch.org/whl/cu124
+torch==2.1.2+cu124
+torchaudio==2.1.2+cu124 
 numpy<2
 runpod~=1.7.9
 yt_dlp
 faster-whisper==1.1.0
-ctranslate2==4.4.0
+ctranslate2==4.5.0  
 
 # Torch + CT2 version: https://github.com/SYSTRAN/faster-whisper/issues/1086
+# CT2 <4.5.0 uses libcudnn 8 and dont run on dockerimage nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04
