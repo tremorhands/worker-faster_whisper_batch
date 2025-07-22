@@ -1,19 +1,11 @@
 {
   "input": {
-    "audio": "https://www.youtube.com/watch?v=XFrn7oA4jgk", 
-    "model": "deepdml/faster-whisper-large-v3-turbo-ct2",
+    "audio": "https://www.youtube.com/watch?v=XSw8ksDfC7s",
     "transcription": "plain text",
     "translate": false,
-    "temperature": 0,
-    "best_of": 5,
-    "beam_size": 5,
-    "suppress_tokens": "-1",
-    "condition_on_previous_text": false,
-    "temperature_increment_on_fallback": 0.2,
-    "compression_ratio_threshold": 2.4,
-    "logprob_threshold": -1,
-    "no_speech_threshold": 0.6,
-    "batch_size": 64
+    "beam_size": 1,
+    "batch_size": 22,
+    "enable_vad": true
   },
   "timeout": 20000
 }

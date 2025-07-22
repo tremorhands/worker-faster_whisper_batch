@@ -15,10 +15,7 @@ from runpod.serverless.utils.rp_validator import validate
 from yt_downloader import audio_from_url
 import runpod
 import predict
-
-import torch
-print("torch.cuda:", torch.cuda.is_available(), torch.version.cuda)
-
+import time
 
 MODEL = predict.Predictor()
 MODEL.setup()
@@ -53,6 +50,8 @@ def run_whisper_job(job):
     '''
     job_input = job['input']
 
+    time_start = time.time()
+
     with rp_debugger.LineTimer('validation_step'):
         input_validation = validate(job_input, INPUT_VALIDATIONS)
 
@@ -77,11 +76,12 @@ def run_whisper_job(job):
                 audio_input = download_files_from_urls(job['id'], [job_input['audio']])[0]
             elif job_input.get('audio_base64', False):
                 audio_input = base64_to_tempfile(job_input['audio_base64'])
-
+        download_time = round(time.time() - time_start, 1)
+        transcribe_start = time.time()
         with rp_debugger.LineTimer('prediction_step'):
             whisper_results = MODEL.predict(
                 audio=audio_input,
-                model_name=job_input.get("model", "deepdml/faster-whisper-large-v3-turbo-ct2"),
+                # model_name=job_input.get("model", "deepdml/faster-whisper-large-v3-turbo-ct2"),
                 transcription=job_input["transcription"],
                 translation=job_input["translation"],
                 translate=job_input["translate"],
@@ -102,9 +102,15 @@ def run_whisper_job(job):
                 word_timestamps=job_input["word_timestamps"],
                 batch_size=job_input.get("batch_size", 0)
             )
+        transcribe_time = round(time.time() - transcribe_start, 1)
+        processing_time = round(time.time() - time_start, 1)
 
         whisper_results.update(video_info)
-
+        whisper_results.update({
+            'download_time': download_time,
+            'transcribe_time': transcribe_time,
+            'total_time': processing_time,
+        })
         with rp_debugger.LineTimer('cleanup_step'):
             rp_cleanup.clean(['input_objects'])
 
