@@ -4,8 +4,8 @@ torchaudio==2.4.1+cu124
 numpy<2
 
 # faster-whisper==1.1.1
-faster-whisper @ git+https://github.com/mobiusml/faster-whisper.git@main
-ctranslate2==4.6.0  
+# faster-whisper @ git+https://github.com/mobiusml/faster-whisper.git@main
+# ctranslate2==4.6.0  
 
 runpod~=1.7.9
 yt_dlp
