@@ -38,7 +38,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install huggingface_hub[hf_xet] && \
     pip install --no-cache-dir -r /requirements.txt && \
     pip install --no-cache-dir \
-      "faster-whisper @ git+https://github.com/mobiusml/faster-whisper.git@master" \
+      git+https://github.com/mobiusml/faster-whisper.git \
       "ctranslate2==4.6.0"
 
 
