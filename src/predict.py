@@ -177,15 +177,15 @@ class Predictor:
                     compression_ratio_threshold=compression_ratio_threshold,
                     log_prob_threshold=logprob_threshold,
                     no_speech_threshold=no_speech_threshold,
-                    condition_on_previous_text=condition_on_previous_text,
+                    # condition_on_previous_text=condition_on_previous_text,
                     initial_prompt=initial_prompt,
                     prefix=None,
                     suppress_blank=True,
                     suppress_tokens=[-1],  # Might need conversion from string
                     without_timestamps=False,
-                    max_initial_timestamp=1.0,
+                    # max_initial_timestamp=1.0,
                     word_timestamps=word_timestamps,
-                    vad_filter=enable_vad,
+                    # vad_filter=enable_vad,
                     batch_size=batch_size,
                 )
             )
@@ -204,7 +204,7 @@ class Predictor:
                     compression_ratio_threshold=compression_ratio_threshold,
                     log_prob_threshold=logprob_threshold,
                     no_speech_threshold=no_speech_threshold,
-                    condition_on_previous_text=condition_on_previous_text,
+                    # condition_on_previous_text=condition_on_previous_text,
                     initial_prompt=initial_prompt,
                     prefix=None,
                     suppress_blank=True,

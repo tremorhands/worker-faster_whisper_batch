@@ -1,10 +1,10 @@
 {
   "input": {
-    "audio": "https://www.youtube.com/watch?v=XSw8ksDfC7s",
+    "audio": "https://www.youtube.com/watch?v=aauY34As0Yo",
     "transcription": "plain text",
     "translate": false,
     "beam_size": 1,
-    "batch_size": 22,
+    "batch_size": 12,
     "enable_vad": true
   },
   "timeout": 20000
